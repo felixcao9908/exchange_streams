@@ -1,0 +1,66 @@
+# config.toml
+
+[vertex.mainnet.arbitrum_one]
+gateway_ws = "wss://gateway.prod.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.prod.vertexprotocol.com/v1"
+subscriptions = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.prod.vertexprotocol.com/v1"
+trigger = "https://trigger.prod.vertexprotocol.com/v1"
+
+[vertex.mainnet.blast]
+gateway_ws = "wss://gateway.blast-prod.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.blast-prod.vertexprotocol.com/v1"
+gateway_v2 = "https://gateway.blast-prod.vertexprotocol.com/v2"
+subscriptions = "wss://gateway.blast-prod.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.blast-prod.vertexprotocol.com/v1"
+archive_indexer_v2 = "https://archive.blast-prod.vertexprotocol.com/v2"
+trigger = "https://trigger.blast-prod.vertexprotocol.com/v1"
+
+[vertex.mainnet.mantle]
+gateway_ws = "wss://gateway.mantle-prod.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.mantle-prod.vertexprotocol.com/v1"
+gateway_v2 = "https://gateway.mantle-prod.vertexprotocol.com/v2"
+subscriptions = "wss://gateway.mantle-prod.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.mantle-prod.vertexprotocol.com/v1"
+archive_indexer_v2 = "https://archive.mantle-prod.vertexprotocol.com/v2"
+trigger = "https://trigger.mantle-prod.vertexprotocol.com/v1"
+
+[vertex.mainnet.sei]
+gateway_ws = "wss://gateway.sei-prod.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.sei-prod.vertexprotocol.com/v1"
+subscriptions = "wss://gateway.sei-prod.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.sei-prod.vertexprotocol.com/v1"
+trigger = "https://trigger.sei-prod.vertexprotocol.com/v1"
+
+[vertex.testnet.arbitrum_sepolia]
+gateway_ws = "wss://gateway.sepolia-test.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.sepolia-test.vertexprotocol.com/v1"
+subscriptions = "wss://gateway.sepolia-test.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.sepolia-test.vertexprotocol.com/v1"
+trigger = "https://trigger.sepolia-test.vertexprotocol.com/v1"
+
+[vertex.testnet.blast_sepolia]
+gateway_ws = "wss://gateway.blast-test.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.blast-test.vertexprotocol.com/v1"
+subscriptions = "wss://gateway.blast-test.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.blast-test.vertexprotocol.com/v1"
+trigger = "https://trigger.blast-test.vertexprotocol.com/v1"
+
+[vertex.testnet.mantle_sepolia]
+gateway_ws = "wss://gateway.mantle-test.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.mantle-test.vertexprotocol.com/v1"
+gateway_v2 = "https://gateway.mantle-test.vertexprotocol.com/v2"
+subscriptions = "wss://gateway.mantle-test.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.mantle-test.vertexprotocol.com/v1"
+archive_indexer_v2 = "https://archive.mantle-test.vertexprotocol.com/v2"
+trigger = "https://trigger.mantle-test.vertexprotocol.com/v1"
+
+[vertex.testnet.sei_atlantic_2]
+gateway_ws = "wss://gateway.sei-test.vertexprotocol.com/v1/ws"
+gateway_rest = "https://gateway.sei-test.vertexprotocol.com/v1"
+subscriptions = "wss://gateway.sei-test.vertexprotocol.com/v1/subscribe"
+archive_indexer = "https://archive.sei-test.vertexprotocol.com/v1"
+trigger = "https://trigger.sei-test.vertexprotocol.com/v1"
+
+[drift.testnet]
+gateway_ws = "wss://dlob.drift.trade/ws"

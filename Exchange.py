@@ -2,9 +2,9 @@ import websocket
 
 
 class Exchange:
-    def __init__(self, name, websocket, rest_endpoint):
+    def __init__(self, name, _websocket, rest_endpoint):
         self.name = name
-        self.websocket = websocket
+        self.websocket = _websocket
         self.rest_endpoint = rest_endpoint
 
     def get_name(self):
@@ -18,8 +18,8 @@ class Exchange:
 
 
 class Product(Exchange):
-    def __init__(self, name, websocket_endpoint, rest_endpoint, product_id, depth):
-        super().__init__(name, websocket_endpoint, rest_endpoint)
+    def __init__(self, name, websocket, rest_endpoint, product_id, depth):
+        super().__init__(name, websocket, rest_endpoint)
         self.product_id = product_id
         self.depth = depth
 

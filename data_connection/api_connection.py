@@ -5,6 +5,7 @@ import websocket
 import json
 from Exchange import Product
 
+
 @cache
 def get_url(Product: Product) -> str:
     """
@@ -25,6 +26,7 @@ def get_url(Product: Product) -> str:
     else:
         raise ValueError(f"Invalid product: {Product.get_name()}")
     return url
+
 
 @cache
 def get_params(Product: Product) -> dict:
@@ -54,7 +56,33 @@ def get_params(Product: Product) -> dict:
         raise ValueError(f"Invalid product: {Product.get_name()}")
     return params
 
-def get_market_liquidity(Product: Product) -> dict:
+
+def get_market_liquidity_drift(Product: Product) -> dict:
+    """
+    Fetches market liquidity data for a specified product and depth.
+
+    Args:
+        Product (Product): Product object containing exchange and product information.
+
+    Returns:
+        dict: Parsed JSON response containing bids, asks, and timestamp.
+    """
+    params = get_params(Product)
+    try:
+        ws = Product.get_websocket()
+        ws.send(json.dumps(params))
+        while True:
+            response = ws.recv()
+            temp = json.loads(response)
+            if 'data' in temp:
+                return temp
+    except requests.exceptions.RequestException as e:
+        raise SystemExit(f"Request failed: {e}")
+    except websocket.WebSocketException as e:
+        raise SystemExit(f"WebSocket request failed: {e}")
+
+
+def get_market_liquidity_vertex(Product: Product) -> dict:
     """
     Fetches market liquidity data for a specified product and depth.
 
@@ -67,27 +95,15 @@ def get_market_liquidity(Product: Product) -> dict:
     url = get_url(Product)
     params = get_params(Product)
     try:
-        if Product.get_name() == 'Vertex':
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            data = response.json()
-            if data['status'] == 'success':
-                return data['data']
-            else:
-                raise ValueError(f"API error: {data}")
-        elif Product.get_name() == 'Drift':
-            ws = Product.get_websocket()
-            #ws.connect(url)
-            ws.send(json.dumps(params))
-            i = 0
-            while i<=2:
-                response = ws.recv()
-                if response:
-                    data = json.loads(response)
-                else:
-                    print("Error receiving message")
-                i += 1
-            return data
+        ws = Product.get_websocket()
+        ws.send(json.dumps(params))
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        if data['status'] == 'success':
+            return data['data']
+        else:
+            raise ValueError(f"API error: {data}")
     except requests.exceptions.RequestException as e:
         raise SystemExit(f"Request failed: {e}")
     except websocket.WebSocketException as e:

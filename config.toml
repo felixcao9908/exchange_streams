@@ -64,3 +64,6 @@ trigger = "https://trigger.sei-test.vertexprotocol.com/v1"
 
 [drift.testnet]
 gateway_ws = "wss://dlob.drift.trade/ws"
+
+[drift.mainnet]
+gateway_ws = "wss://dlob.drift.trade/ws"

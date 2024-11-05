@@ -39,6 +39,7 @@ def main():
         print(json.dumps(parsed_data_vertex, indent=2))
         print(json.dumps(parsed_data_drift, indent=2))
         i += 1
+    return {"vertex": parsed_data_vertex, "drift": parsed_data_drift}
 
 
 if __name__ == "__main__":

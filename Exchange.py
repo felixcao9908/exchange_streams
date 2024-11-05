@@ -1,16 +1,17 @@
 import websocket
+
+
 class Exchange:
-    def __init__(self, name, websocket_endpoint, rest_endpoint):
+    def __init__(self, name, websocket, rest_endpoint):
         self.name = name
-        self.websocket = websocket.WebSocket()
-        self.websocket.connect(websocket_endpoint)
-        self.websocket_endpoint = websocket_endpoint
+        self.websocket = websocket
         self.rest_endpoint = rest_endpoint
 
     def get_name(self):
         return self.name
-    def get_websocket_endpoint(self):
-        return self.websocket_endpoint
+
+    def get_websocket(self):
+        return self.websocket
 
     def get_rest_endpoint(self):
         return self.rest_endpoint

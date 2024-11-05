@@ -1,8 +1,11 @@
+from functools import cache
+
 import requests
 import websocket
 import json
 from Exchange import Product
 
+@cache
 def get_url(Product: Product) -> str:
     """
     Returns the URL for a specified product.
@@ -17,12 +20,13 @@ def get_url(Product: Product) -> str:
         endpoint = Product.get_rest_endpoint()
         url = f"{endpoint}/query"
     elif Product.get_name() == 'Drift':
-        endpoint = Product.get_websocket_endpoint()
+        endpoint = Product.get_websocket()
         url = endpoint
     else:
         raise ValueError(f"Invalid product: {Product.get_name()}")
     return url
 
+@cache
 def get_params(Product: Product) -> dict:
     """
     Returns the parameters for a specified product.
@@ -72,19 +76,18 @@ def get_market_liquidity(Product: Product) -> dict:
             else:
                 raise ValueError(f"API error: {data}")
         elif Product.get_name() == 'Drift':
-            ws = Product.websocket
-            ws.connect(url)
+            ws = Product.get_websocket()
+            #ws.connect(url)
             ws.send(json.dumps(params))
             i = 0
-            while True:
+            while i<=2:
                 response = ws.recv()
                 if response:
                     data = json.loads(response)
                 else:
                     print("Error receiving message")
-                if i == 2:
-                    return data
                 i += 1
+            return data
     except requests.exceptions.RequestException as e:
         raise SystemExit(f"Request failed: {e}")
     except websocket.WebSocketException as e:

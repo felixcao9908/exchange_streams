@@ -62,5 +62,9 @@ subscriptions = "wss://gateway.sei-test.vertexprotocol.com/v1/subscribe"
 archive_indexer = "https://archive.sei-test.vertexprotocol.com/v1"
 trigger = "https://trigger.sei-test.vertexprotocol.com/v1"
 
+
 [drift.testnet]
 gateway_ws = "wss://dlob.drift.trade/ws"
+
+
+

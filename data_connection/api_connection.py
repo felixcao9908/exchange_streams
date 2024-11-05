@@ -1,6 +1,10 @@
+import timeit
 from functools import cache
+import asyncio
+import ssl
 
 import requests
+import websockets
 import websocket
 import json
 from Exchange import Product
@@ -18,8 +22,10 @@ def get_url(Product: Product) -> str:
         str: URL for the specified product.
     """
     if Product.get_name() == 'Vertex':
-        endpoint = Product.get_rest_endpoint()
-        url = f"{endpoint}/query"
+        endpoint = Product.get_websocket()
+        url = endpoint
+        # endpoint = Product.get_rest_endpoint()
+        # url = f"{endpoint}/query"
     elif Product.get_name() == 'Drift':
         endpoint = Product.get_websocket()
         url = endpoint
@@ -41,9 +47,12 @@ def get_params(Product: Product) -> dict:
     """
     if Product.get_name() == 'Vertex':
         params = {
-            'type': 'market_liquidity',
-            'product_id': Product.get_product_id(),
-            'depth': Product.get_depth()
+            "method": "subscribe",
+            "stream": {
+                "type": "best_bid_offer",
+                "product_id": 2  # BTC-PERP product ID
+            },
+            "id": 10
         }
     elif Product.get_name() == 'Drift':
         params = {
@@ -56,8 +65,22 @@ def get_params(Product: Product) -> dict:
         raise ValueError(f"Invalid product: {Product.get_name()}")
     return params
 
+def get_connection(Product: Product) -> websocket.WebSocket:
+    url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
+    params = json.dumps({
+        "method": "subscribe",
+        "stream": {
+            "type": "best_bid_offer",
+            "product_id": 2  # BTC-PERP product ID
+        },
+        "id": 10
+    })
+    ssl_context = ssl.SSLContext()
+    ws = websockets.connect(url, ssl=ssl_context)
 
-def get_market_liquidity_drift(Product: Product) -> dict:
+
+
+async def get_market_liquidity_drift(Product: Product) -> dict:
     """
     Fetches market liquidity data for a specified product and depth.
 
@@ -82,7 +105,17 @@ def get_market_liquidity_drift(Product: Product) -> dict:
         raise SystemExit(f"WebSocket request failed: {e}")
 
 
-def get_market_liquidity_vertex(Product: Product) -> dict:
+async def get_market_liquidity_vertex(Product: Product) -> dict:
+    url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
+    params = json.dumps({
+        "method": "subscribe",
+        "stream": {
+            "type": "best_bid_offer",
+            "product_id": 2  # BTC-PERP product ID
+        },
+        "id": 10
+    })
+    ssl_context = ssl.SSLContext()
     """
     Fetches market liquidity data for a specified product and depth.
 
@@ -92,19 +125,15 @@ def get_market_liquidity_vertex(Product: Product) -> dict:
     Returns:
         dict: Parsed JSON response containing bids, asks, and timestamp.
     """
-    url = get_url(Product)
-    params = get_params(Product)
     try:
-        ws = Product.get_websocket()
-        ws.send(json.dumps(params))
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        if data['status'] == 'success':
-            return data['data']
-        else:
-            raise ValueError(f"API error: {data}")
-    except requests.exceptions.RequestException as e:
+        async with websockets.connect(url, ssl = ssl_context) as websocket:
+            await websocket.send(params)
+            while True:
+                response = await websocket.recv()
+                data = json.loads(response)
+                if 'type' in data:
+                    return data
+    except Exception as e:
         raise SystemExit(f"Request failed: {e}")
-    except websocket.WebSocketException as e:
-        raise SystemExit(f"WebSocket request failed: {e}")
+
+

@@ -20,9 +20,9 @@ def parse_liquidity_data(data: dict, Product: Product) -> dict:
         except Exception as e:
             raise ValueError(f"Failed to parse JSON data: {e}")
     if Product.get_name() == 'Vertex':
-        bids = [(int(price) / 1e18, int(volume) / 1e18) for price, volume in data['bids']]
-        asks = [(int(price) / 1e18, int(volume) / 1e18) for price, volume in data['asks']]
-        timestamp = int(data['timestamp']) / 1e6
+        bids = (int(data.get("bid_price"))/1e18, int(data.get("bid_qty"))/1e18)
+        asks = (int(data.get("ask_price"))/1e18, int(data.get("ask_qty"))/1e18)
+        timestamp = int(data.get('timestamp')) / 1e6
     else:
         bids = [(int(item['price']) / 1e6, int(item['size']) / 1e6) for item in data['bids'][:1]]
         asks = [(int(item['price']) / 1e6, int(item['size']) / 1e6) for item in data['asks'][:1]]

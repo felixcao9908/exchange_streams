@@ -1,6 +1,7 @@
 import asyncio
 import websockets
 import json
+import ssl
 
 async def subscribe_best_bid_offer():
     url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
@@ -13,7 +14,7 @@ async def subscribe_best_bid_offer():
         "id": 10
     })
 
-    async with websockets.connect(url) as websocket:
+    async with websockets.connect(url, ssl =ssl.SSLContext()) as websocket:
         await websocket.send(subscription_message)
 
         while True:

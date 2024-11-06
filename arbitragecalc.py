@@ -1,7 +1,9 @@
 # arbitrage_calculator.py
 import json
-from main import main
+from main import Vertex, Drift
 import time
+import data_connection.api_connection as apc
+import utils.data_handler as dh
 
 def calculate_arbitrage(parsed_data_vertex, parsed_data_drift):
     vertex_bid = parsed_data_vertex["bids"][0][0]
@@ -10,8 +12,8 @@ def calculate_arbitrage(parsed_data_vertex, parsed_data_drift):
     drift_ask = parsed_data_drift["asks"][0][0]
 
     # Define fees as basis points (bps)
-    vertex_fee_bps = 6  # 6 bps
-    drift_fee_bps = 2.5  # 2.5 bps
+    vertex_fee_bps = 4  # 2 bps
+    drift_fee_bps = 5  # 2.5 bps
 
     # Convert bps to decimal and calculate adjusted prices after fees
     vertex_bid_adj = vertex_bid * (1 - vertex_fee_bps / 10000)
@@ -29,24 +31,24 @@ def calculate_arbitrage(parsed_data_vertex, parsed_data_drift):
     else:
         print("No arbitrage opportunity detected after accounting for fees.")
 
-
 def main_arbitrage():
     i = 0
-    while i <= 2:
-        # Run the main function from main.py to get parsed data
-        start_time =time.time()
-        parsed_data = main()
-        end_time = time.time()
-
+    while i <= 10:
+        # Fetch and parse Vertex data
+        start_time = time.time()
+        raw_data_vertex = apc.get_market_liquidity_vertex(Vertex)
+        parsed_data_vertex = dh.parse_liquidity_data(raw_data_vertex, Vertex)
+        print(f"Vertex Data: {json.dumps(parsed_data_vertex, indent=2)}")
         
-        # Unpack parsed data for Vertex and Drift
-        parsed_data_vertex = parsed_data['vertex']
-        parsed_data_drift = parsed_data['drift']
-
-        # Calculate arbitrage
+        # Fetch and parse Drift data
+        raw_data_drift = apc.get_market_liquidity_drift(Drift)
+        parsed_data_drift = dh.parse_liquidity_data(raw_data_drift, Drift)
+        print(f"Drift Data: {json.dumps(parsed_data_drift, indent=2)}")
+        
+        # Calculate arbitrage after fetching both datasets
         calculate_arbitrage(parsed_data_vertex, parsed_data_drift)
-        
 
+        end_time = time.time()
         print(f"Execution time: {end_time - start_time:.6f} seconds")
 
         i += 1

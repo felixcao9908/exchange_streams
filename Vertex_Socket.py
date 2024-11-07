@@ -4,10 +4,9 @@ import websockets
 import json
 
 vertex_data = {
-    "bid_price": None,
-    "bid_qty": None,
-    "ask_price": None,
-    "ask_qty": None
+    "bids": None,
+    "asks": None,
+    "timestamp_ms": None
 }
 
 async def subscribe_best_bid_offer_vertex():
@@ -28,18 +27,15 @@ async def subscribe_best_bid_offer_vertex():
         while True:
             response = await websocket.recv()
             data = json.loads(response)
-            
-            # Debugging output
-            print("Received data from Vertex:", data)
 
-            # Update bid and ask data with scaling
-            vertex_data["bid_price"] = float(data.get("bid_price")) / 1e18
-            vertex_data["bid_qty"] = float(data.get("bid_qty")) / 1e18
-            vertex_data["ask_price"] = float(data.get("ask_price")) / 1e18
-            vertex_data["ask_qty"] = float(data.get("ask_qty")) / 1e18
-
-            # Confirm updated data
-            print("Updated Vertex data:", vertex_data)
+            # Check for and parse bid/ask fields directly
+            if "bid_price" in data and "ask_price" in data:
+                vertex_data["bids"] = [(float(data["bid_price"]) / 1e18, float(data["bid_qty"]) / 1e18)]
+                vertex_data["asks"] = [(float(data["ask_price"]) / 1e18, float(data["ask_qty"]) / 1e18)]
+                vertex_data["timestamp_ms"] = int(data["timestamp"])
+                # print("Updated Vertex data:", vertex_data)  # For debugging, remove if unnecessary
+            else:
+                print("Vertex WebSocket message received:", data)  # Only print if data is unexpected
 
 async def start_vertex_socket():
     await subscribe_best_bid_offer_vertex()

@@ -2,12 +2,12 @@
 import asyncio
 import websockets
 import json
+from utils.data_handler import parse_drift_data
 
 drift_data = {
-    "bid_price": None,
-    "bid_qty": None,
-    "ask_price": None,
-    "ask_qty": None
+    "bids": None,
+    "asks": None,
+    "timestamp_ms": None
 }
 
 async def subscribe_best_bid_offer_drift():
@@ -27,17 +27,18 @@ async def subscribe_best_bid_offer_drift():
             response = await websocket.recv()
             data = json.loads(response)
 
-            # Debugging output
-            print("Received data from Drift:", data)
-
-            # Update bid and ask data
-            drift_data["bid_price"] = float(data.get("bid_price"))
-            drift_data["bid_qty"] = float(data.get("bid_qty"))
-            drift_data["ask_price"] = float(data.get("ask_price"))
-            drift_data["ask_qty"] = float(data.get("ask_qty"))
-
-            # Confirm updated data
-            print("Updated Drift data:", drift_data)
+            # Parse bids, asks, and timestamp
+            if "data" in data:
+                orderbook = json.loads(data["data"])  # Load JSON string
+                if "bids" in orderbook and "asks" in orderbook:
+                    drift_data["bids"] = [(float(orderbook["bids"][0]["price"]) / 1e6, float(orderbook["bids"][0]["size"]) / 1e6)]
+                    drift_data["asks"] = [(float(orderbook["asks"][0]["price"]) / 1e6, float(orderbook["asks"][0]["size"]) / 1e6)]
+                    
+                    
+                    drift_data["timestamp_ms"] = int(orderbook["ts"])
+                    # print("Updated Drift data:", drift_data)  # For debugging, remove if unnecessary
+            else:
+                print("Drift WebSocket message received:", data)  # Only print if data is unexpected
 
 async def start_drift_socket():
     await subscribe_best_bid_offer_drift()

@@ -1,8 +1,16 @@
+# vertex_socket.py
 import asyncio
 import websockets
 import json
 
-async def subscribe_best_bid_offer():
+vertex_data = {
+    "bid_price": None,
+    "bid_qty": None,
+    "ask_price": None,
+    "ask_qty": None
+}
+
+async def subscribe_best_bid_offer_vertex():
     url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
     subscription_message = json.dumps({
         "method": "subscribe",
@@ -14,19 +22,24 @@ async def subscribe_best_bid_offer():
     })
 
     async with websockets.connect(url) as websocket:
+        print("Connected to Vertex WebSocket")
         await websocket.send(subscription_message)
 
         while True:
             response = await websocket.recv()
             data = json.loads(response)
+            
+            # Debugging output
+            print("Received data from Vertex:", data)
 
-            # Extract and print bid and ask prices and quantities
-            bid_price = data.get("bid_price")
-            bid_qty = data.get("bid_qty")
-            ask_price = data.get("ask_price")
-            ask_qty = data.get("ask_qty")
+            # Update bid and ask data with scaling
+            vertex_data["bid_price"] = float(data.get("bid_price")) / 1e18
+            vertex_data["bid_qty"] = float(data.get("bid_qty")) / 1e18
+            vertex_data["ask_price"] = float(data.get("ask_price")) / 1e18
+            vertex_data["ask_qty"] = float(data.get("ask_qty")) / 1e18
 
-            print(f"Bid Price: {bid_price}, Bid Qty: {bid_qty}, Ask Price: {ask_price}, Ask Qty: {ask_qty}")
+            # Confirm updated data
+            print("Updated Vertex data:", vertex_data)
 
-# Run the asynchronous function
-asyncio.run(subscribe_best_bid_offer())
+async def start_vertex_socket():
+    await subscribe_best_bid_offer_vertex()

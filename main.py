@@ -25,19 +25,15 @@ Vertex = Product('Vertex', ws_vertex, config['vertex'][env]['arbitrum_one']['gat
 Drift = Product('Drift', ws_drift, None, "BTC-PERP", None)
 
 
-async def get_data(Product_1: Product, Product_2: Product):
-    raw_data_vertex, raw_data_drift = await asyncio.gather(
-        apc.get_market_liquidity_vertex(Product_1),
-        apc.get_market_liquidity_drift(Product_2)
-    )
-    return raw_data_vertex, raw_data_drift
+
 
 
 def main():
     i = 0
     while i <= 10:
         start = timeit.default_timer()
-        raw_data_vertex, raw_data_drift = asyncio.run(get_data(Vertex, Drift))
+        raw_data_vertex = apc.get_market_liquidity_vertex(Vertex),
+        raw_data_drift = apc.get_market_liquidity_drift(Drift)
         end = timeit.default_timer()
         print(f"Time taken: {end - start}")
         parsed_data_vertex = dh.parse_liquidity_data(raw_data_vertex, Vertex)

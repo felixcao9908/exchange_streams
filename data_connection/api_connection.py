@@ -65,22 +65,10 @@ def get_params(Product: Product) -> dict:
         raise ValueError(f"Invalid product: {Product.get_name()}")
     return params
 
-def get_connection(Product: Product) -> websocket.WebSocket:
-    url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
-    params = json.dumps({
-        "method": "subscribe",
-        "stream": {
-            "type": "best_bid_offer",
-            "product_id": 2  # BTC-PERP product ID
-        },
-        "id": 10
-    })
-    ssl_context = ssl.SSLContext()
-    ws = websockets.connect(url, ssl=ssl_context)
 
 
 
-async def get_market_liquidity_drift(Product: Product) -> dict:
+def get_market_liquidity_drift(Product: Product) -> dict:
     """
     Fetches market liquidity data for a specified product and depth.
 
@@ -105,17 +93,7 @@ async def get_market_liquidity_drift(Product: Product) -> dict:
         raise SystemExit(f"WebSocket request failed: {e}")
 
 
-async def get_market_liquidity_vertex(Product: Product) -> dict:
-    url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
-    params = json.dumps({
-        "method": "subscribe",
-        "stream": {
-            "type": "best_bid_offer",
-            "product_id": 2  # BTC-PERP product ID
-        },
-        "id": 10
-    })
-    ssl_context = ssl.SSLContext()
+def get_market_liquidity_vertex(Product: Product) -> dict:
     """
     Fetches market liquidity data for a specified product and depth.
 
@@ -125,14 +103,25 @@ async def get_market_liquidity_vertex(Product: Product) -> dict:
     Returns:
         dict: Parsed JSON response containing bids, asks, and timestamp.
     """
+    params = json.dumps({
+        "method": "subscribe",
+        "stream": {
+            "type": "best_bid_offer",
+            "product_id": 2  # BTC-PERP product ID
+        },
+        "id": 10
+    })
+    url = "wss://gateway.prod.vertexprotocol.com/v1/subscribe"
+
+    ssl_context = ssl.SSLContext()
     try:
-        async with websockets.connect(url, ssl = ssl_context) as websocket:
-            await websocket.send(params)
-            while True:
-                response = await websocket.recv()
-                data = json.loads(response)
-                if 'type' in data:
-                    return data
+        ws = websocket.create_connection(url, sslopt={"cert_reqs": ssl.CERT_NONE}, header=["Sec-WebSocket-Extensions: permessage-deflate"])
+        ws.send(params)
+        while True:
+            response = ws.recv()
+            data = json.loads(response)
+            if 'type' in data:
+                return data
     except Exception as e:
         raise SystemExit(f"Request failed: {e}")
 

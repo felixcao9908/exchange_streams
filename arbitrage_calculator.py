@@ -95,9 +95,10 @@ async def calculate_arbitrage():
                                  opp["profit_after_fees"], opp["spread"], opp["time_gap_ms"], 
                                  opp["vertex_time"], opp["drift_time"]])
 
-async def main_arbitrage():
-    vertex_task = asyncio.create_task(start_vertex_socket())
-    drift_task = asyncio.create_task(start_drift_socket())
+async def main_arbitrage(exchanges: list):
+    tasks = []
+    for exchange in exchanges:
+        tasks.append(asyncio.create_task(exchange.start_socket()))
 
     try:
         while True:
